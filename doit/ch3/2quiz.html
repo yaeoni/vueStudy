@@ -1,0 +1,35 @@
+<html>
+<head>
+    <title>3-2 Quiz</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.2/dist/vue.js"></script>
+</head>
+<body>
+    <div id = "app">
+        <todo-footer></todo-footer>
+    </div>
+    
+    <div id="app2">
+        <todo-list></todo-list>
+    </div>
+
+    <script>
+        Vue.component('todo-footer',{
+            template:"<p>global compo</p>"
+        })
+        new Vue({
+            el:"#app"
+        })
+
+        var cmp = {
+            template:"<p>local compo</p>"
+        }
+        new Vue({
+            el:"#app2",
+            components: {
+                "todo-list":cmp
+            }
+        })
+
+    </script>
+</body>
+</html>

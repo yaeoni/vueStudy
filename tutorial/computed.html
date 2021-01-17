@@ -1,0 +1,161 @@
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios@0.12.0/dist/axios.min.js"></script>
+<script src="https://unpkg.com/lodash@4.13.1/lodash.min.js"></script>
+
+<div id ="example">
+    <p>원본 메시지 : "{{message}}"</p>
+    <p>역순 메시지 : "{{ reverseMessage }}</p>
+    <p>computed & method : "{{now() }}"</p>
+    <div id ="demo">{{fullName}}</div>
+</div>
+
+<div id="watch-example">
+    <p>
+        yes/no 질문 물어보세요:
+        <input v-model="question">
+    </p>
+    <p>{{answer}}</p>
+</div>
+
+<div id="class"
+v-bind:style="{ color: activeColor, fontSize: fontSize + 'px' }"
+>가나다라</div>
+
+<div id="if">
+    <p v-if="test">can see</p>
+    <p v-else>cannot see</p>
+</div>
+
+<ul id="example-1">
+    <li v-for="item in items">
+        {{ item.message }}
+    </li>
+</ul>
+
+<ul id="example-2">
+    <li v-for="(item, index) in items">
+        {{ parentMessage}} - {{index}} - {{item.message}}
+    </li>
+</ul>
+
+<ul id="v-for-object" class="demo">
+    <li v-for="value in object">
+        {{ value }}
+    </li>
+    <li v-for="n in evenNumbers">{{n}}</li>
+</ul>
+
+
+<script>
+    var vm = new Vue({
+        el:"#example",
+        data:{
+            message:'안녕하세여',
+            firstName: "Oh",
+            lastName:"yaewon",
+        },
+        computed:{
+            reverseMessage : function(){
+                return this.message.split('').reverse().join('')
+            },
+            fullName: function(){
+                return this.firstName + " " + this.lastName
+            }
+        },
+        methods:{
+            now: function(){
+                return Date.now()
+            }
+        }
+    })
+
+    var watchEx = new Vue({
+        el:'#watch-example',
+        data:{
+            question:'',
+            answer:'질문해야 답을 합니다'
+        },
+        watch:{
+            //질문 변경될 때마다 기능 실행
+            question: function(newQuestion){
+                this.answer='입력 기달중'
+                this.debouncedGetAnswer()
+            }
+        },
+        created: function(){
+            this.debouncedGetAnswer = _.debounce(this.getAnswer, 500)
+        },
+        methods:{
+            getAnswer:function(){
+                if(this.question.indexOf('?')===-1){
+                    this.answer ='질문엔 물음표 필요'
+                    return
+                }
+                this.answer = '생각중'
+                var vm = this
+                axios.get('https://yesno.wtf/api')
+                    .then(function(res){
+                        vm.answer = _.capitalize(res.data.answer)
+                    })
+                    .catch(err=>{
+                        vm.answer="Error, server error" + err
+                    })
+            }
+        }
+    });
+
+    var classEx = new Vue({
+        el:"#class",
+        data: {
+        activeColor: 'red',
+        fontSize: 30
+        }
+    })
+    
+    var conditionEx = new Vue({
+        el:'#if',
+        data:{
+            test: true
+        },
+    })
+    
+    var example1 = new Vue({
+        el:'#example-1',
+        data:{
+            items:[
+                {message:'OhOH'},
+                {message:'yaeyae'}
+            ]
+        }
+    })
+
+    var example2 = new Vue({
+        el:'#example-2',
+        data:{
+            parentMessage:'Parent',
+            items:[
+                {message:"Yaewon"},
+                {message:"Yaejin"}
+            ]
+        }
+    })
+
+    new Vue({
+        el:'#v-for-object',
+        data:{
+            object:{
+                titile:"How to list",
+                author:"YAEYAE",
+                publishedAt:'2021.01.16'
+            },
+            numbers:[1,2,3,4,5]
+        },
+        computed:{
+            evenNumbers:function(){
+                return this.numbers.filter(function(number){
+                    return number%2===0
+                })
+            }
+        }
+    })
+</script>
